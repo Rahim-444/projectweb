@@ -112,6 +112,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       });
 
+      // Vérifier la correspondance des mots de passe
       const passwordInputs = form.querySelectorAll('input[type="password"]');
       if (
         passwordInputs.length === 2 &&
@@ -144,11 +145,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
-  function isValidEmail(email) {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  }
-
+  // Prévisualisation des images
   const imageInput = document.getElementById("image");
   if (imageInput) {
     imageInput.addEventListener("change", function() {
@@ -166,12 +163,62 @@ document.addEventListener("DOMContentLoaded", function() {
           }
 
           preview.innerHTML = `
-                        <p>Aperçu :</p>
-                        <img src="${e.target.result}" alt="Aperçu" style="max-width: 200px; max-height: 200px; margin-top: 5px;">
-                    `;
+            <p>Aperçu :</p>
+            <img src="${e.target.result}" alt="Aperçu" style="max-width: 200px; max-height: 200px; margin-top: 5px;">
+          `;
         };
         reader.readAsDataURL(file);
       }
     });
   }
+
+  // Menu d'administration
+  const menuItems = document.querySelectorAll(".admin-menu li a");
+  const sections = document.querySelectorAll(".admin-section");
+
+  // Vérifier si un hash est présent dans l'URL
+  const hash = window.location.hash;
+  if (hash) {
+    menuItems.forEach(function(mi) {
+      mi.parentElement.classList.remove("active");
+      if (mi.getAttribute("href") === hash) {
+        mi.parentElement.classList.add("active");
+      }
+    });
+
+    sections.forEach(function(section) {
+      section.classList.remove("active");
+    });
+
+    const targetId = hash.substring(1);
+    const targetSection = document.getElementById(targetId);
+    if (targetSection) {
+      targetSection.classList.add("active");
+    }
+  }
+
+  menuItems.forEach(function(item) {
+    item.addEventListener("click", function(e) {
+      e.preventDefault();
+
+      menuItems.forEach(function(mi) {
+        mi.parentElement.classList.remove("active");
+      });
+
+      this.parentElement.classList.add("active");
+
+      sections.forEach(function(section) {
+        section.classList.remove("active");
+      });
+
+      const targetId = this.getAttribute("href").substring(1);
+      document.getElementById(targetId).classList.add("active");
+    });
+  });
 });
+
+// Fonction pour valider les emails
+function isValidEmail(email) {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}

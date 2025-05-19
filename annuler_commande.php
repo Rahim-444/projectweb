@@ -1,7 +1,6 @@
 <?php
 require_once 'functions.php';
 
-// Rediriger si non connecté
 if (!estConnecte()) {
     header('Location: login.php');
     exit;

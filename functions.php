@@ -317,10 +317,21 @@ function getDetailsCommande($id_utilisateur, $id_commande)
 {
     $conn = connectDB();
 
-    // Appel de la procédure stockée pour récupérer les détails
-    $query = "CALL AfficherDetailsCommande(?, ?)";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("ii", $id_commande, $id_utilisateur);
+    // Check if user is admin
+    $est_admin = estAdmin();
+
+    if ($est_admin) {
+        // For admin, use a different query that doesn't check user ID
+        $query = "CALL AfficherDetailsCommande(?, NULL)";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $id_commande);
+    } else {
+        // For regular users, use the full query
+        $query = "CALL AfficherDetailsCommande(?, ?)";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("ii", $id_commande, $id_utilisateur);
+    }
+
     $stmt->execute();
 
     $details = [];
@@ -409,5 +420,48 @@ function modifierLivre($id_livre, $titre, $auteur, $id_categorie, $description, 
     $stmt->close();
     $conn->close();
 
+    return $result;
+}
+
+function getAllCommandes()
+{
+    $conn = connectDB();
+
+    $query = "SELECT c.id_commande, c.id_utilisateur, c.date_commande, c.statut, c.total,
+              u.nom, u.prenom, u.email, COUNT(d.id_detail) as nombre_articles
+              FROM Commandes c
+              JOIN Utilisateurs u ON c.id_utilisateur = u.id_utilisateur
+              LEFT JOIN Details_Commande d ON c.id_commande = d.id_commande
+              GROUP BY c.id_commande
+              ORDER BY c.date_commande DESC";
+
+    $result = $conn->query($query);
+    $commandes = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $commandes[] = $row;
+    }
+
+    $conn->close();
+    return $commandes;
+}
+
+function changerStatutCommande($id_commande, $nouveau_statut)
+{
+    $conn = connectDB();
+
+    // Vérifier si le statut est valide
+    $statuts_valides = ['en attente', 'confirmee', 'expediee', 'livree', 'annulee'];
+    if (!in_array($nouveau_statut, $statuts_valides)) {
+        return false;
+    }
+
+    $query = "UPDATE Commandes SET statut = ? WHERE id_commande = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("si", $nouveau_statut, $id_commande);
+    $result = $stmt->execute();
+
+    $stmt->close();
+    $conn->close();
     return $result;
 }

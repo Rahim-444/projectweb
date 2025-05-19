@@ -7,8 +7,8 @@ if (!estConnecte() || !estAdmin()) {
 }
 
 $categories = getToutesCategories();
-
 $livres = getTousLivres();
+$commandes = getAllCommandes();
 
 $message = '';
 
@@ -61,12 +61,21 @@ include 'header.php';
             <li class="active"><a href="#ajouter-livre">Ajouter un livre</a></li>
             <li><a href="#gerer-livres">Gérer les livres</a></li>
             <li><a href="#gerer-commandes">Gérer les commandes</a></li>
-            <li><a href="#gerer-utilisateurs">Gérer les utilisateurs</a></li>
         </ul>
     </div>
 
     <div class="admin-content">
-        <?php echo $message; ?>
+        <?php
+        if (isset($_SESSION['succes'])) {
+            echo '<div class="alert alert-success">' . $_SESSION['succes'] . '</div>';
+            unset($_SESSION['succes']);
+        }
+        if (isset($_SESSION['erreur'])) {
+            echo '<div class="alert alert-danger">' . $_SESSION['erreur'] . '</div>';
+            unset($_SESSION['erreur']);
+        }
+        echo $message;
+        ?>
 
         <div id="ajouter-livre" class="admin-section active">
             <h3>Ajouter un nouveau livre</h3>
@@ -165,40 +174,66 @@ include 'header.php';
 
         <div id="gerer-commandes" class="admin-section">
             <h3>Gérer les commandes</h3>
-            <p>Cette fonctionnalité sera disponible prochainement.</p>
-        </div>
-
-        <div id="gerer-utilisateurs" class="admin-section">
-            <h3>Gérer les utilisateurs</h3>
-            <p>Cette fonctionnalité sera disponible prochainement.</p>
+            <div class="commandes-list">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Client</th>
+                            <th>Date</th>
+                            <th>Statut</th>
+                            <th>Total</th>
+                            <th>Articles</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($commandes)): ?>
+                            <tr>
+                                <td colspan="7" class="no-data">Aucune commande n'a été trouvée.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($commandes as $commande): ?>
+                                <tr
+                                    class="commande-row"
+                                    onclick="window.location.href='details_commande.php?id=<?php echo $commande['id_commande']; ?>'">
+                                    <td><?php echo $commande['id_commande']; ?></td>
+                                    <td>
+                                        <?php echo $commande['prenom'] . ' ' . $commande['nom']; ?><br>
+                                        <small><?php echo $commande['email']; ?></small>
+                                    </td>
+                                    <td><?php echo date('d/m/Y H:i', strtotime($commande['date_commande'])); ?></td>
+                                    <td class="status-<?php echo strtolower(str_replace(' ', '-', $commande['statut'])); ?>">
+                                        <?php echo ucfirst($commande['statut']); ?>
+                                    </td>
+                                    <td><?php echo number_format($commande['total'], 2, ',', ' '); ?> DZD</td>
+                                    <td><?php echo $commande['nombre_articles']; ?></td>
+                                    <td class="actions">
+                                        <?php if ($commande['statut'] === 'En attente'): ?>
+                                            <form action="update_commande.php" method="post" style="display: inline;">
+                                                <input type="hidden" name="id_commande" value="<?php echo $commande['id_commande']; ?>">
+                                                <input type="hidden" name="statut" value="confirmee">
+                                                <button type="submit" class="btn btn-xs btn-success" onclick="return confirm('Accepter cette commande ?')">
+                                                    <i class="fas fa-check"></i> Accepter
+                                                </button>
+                                            </form>
+                                            <form action="update_commande.php" method="post" style="display: inline;">
+                                                <input type="hidden" name="id_commande" value="<?php echo $commande['id_commande']; ?>">
+                                                <input type="hidden" name="statut" value="annulee">
+                                                <button type="submit" class="btn btn-xs btn-danger" onclick="return confirm('Rejeter cette commande ?')">
+                                                    <i class="fas fa-times"></i> Rejeter
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </section>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const menuItems = document.querySelectorAll('.admin-menu li a');
-        const sections = document.querySelectorAll('.admin-section');
-
-        menuItems.forEach(function(item) {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-
-                menuItems.forEach(function(mi) {
-                    mi.parentElement.classList.remove('active');
-                });
-
-                this.parentElement.classList.add('active');
-
-                sections.forEach(function(section) {
-                    section.classList.remove('active');
-                });
-
-                const targetId = this.getAttribute('href').substring(1);
-                document.getElementById(targetId).classList.add('active');
-            });
-        });
-    });
-</script>
 
 <?php include 'footer.php'; ?>

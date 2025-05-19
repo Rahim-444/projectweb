@@ -80,17 +80,29 @@ create table commandes_annulees (
     foreign key (id_commande) references commandes(id_commande)
 );
 
--- procedure pour afficher details commande
+
 delimiter //
 create procedure afficherdetailscommande(in p_id_commande int, in p_id_utilisateur int)
 begin
-    select c.id_commande, c.date_commande, c.statut, c.total,
-           l.titre, l.auteur, d.quantite, d.prix_unitaire, 
-           (d.quantite * d.prix_unitaire) as sous_total
-    from commandes c
-    join details_commande d on c.id_commande = d.id_commande
-    join livres l on d.id_livre = l.id_livre
-    where c.id_commande = p_id_commande and c.id_utilisateur = p_id_utilisateur;
+    -- si p_id_utilisateur est null alors ( admin )
+    if p_id_utilisateur is null then
+        select c.id_commande, c.date_commande, c.statut, c.total,
+               l.titre, l.auteur, d.quantite, d.prix_unitaire, 
+               (d.quantite * d.prix_unitaire) as sous_total
+        from commandes c
+        join details_commande d on c.id_commande = d.id_commande
+        join livres l on d.id_livre = l.id_livre
+        where c.id_commande = p_id_commande;
+    else
+        -- if p_id_utilisateur is not null then ( client )
+        select c.id_commande, c.date_commande, c.statut, c.total,
+               l.titre, l.auteur, d.quantite, d.prix_unitaire, 
+               (d.quantite * d.prix_unitaire) as sous_total
+        from commandes c
+        join details_commande d on c.id_commande = d.id_commande
+        join livres l on d.id_livre = l.id_livre
+        where c.id_commande = p_id_commande and c.id_utilisateur = p_id_utilisateur;
+    end if;
     
     select total from commandes where id_commande = p_id_commande;
 end //
@@ -132,7 +144,6 @@ begin
 end //
 delimiter ;
 
--- procedure pour historique commandes
 delimiter //
 create procedure historiquecommandes(in p_id_utilisateur int)
 begin
@@ -146,7 +157,6 @@ begin
 end //
 delimiter ;
 
--- trigger pour mise a jour stock
 delimiter //
 create trigger after_commande_confirmed
 after update on commandes
@@ -161,7 +171,6 @@ begin
 end //
 delimiter ;
 
--- trigger pour verifier stock
 delimiter //
 create trigger before_details_commande_insert
 before insert on details_commande
@@ -179,7 +188,6 @@ begin
 end //
 delimiter ;
 
--- trigger pour restaurer stock
 delimiter //
 create trigger after_commande_canceled
 after update on commandes
@@ -194,7 +202,6 @@ begin
 end //
 delimiter ;
 
--- trigger pour tracer annulations
 delimiter //
 create trigger after_commande_canceled_history
 after update on commandes
@@ -224,5 +231,5 @@ insert into livres (titre, auteur, id_categorie, description, prix, annee_public
 ('memoires de guerre', 'charles de gaulle', 5, 'temoignage historique de la seconde guerre mondiale', 65.00, 1954, 'plon', 5, 'memoires_guerre.jpg');
 
 insert into utilisateurs (nom, prenom, email, mot_de_passe, est_admin) values
-('admin', 'system', 'admin@bibliotheque-vintage.fr', '$2a$10$pUWUYeDl0yD.ZAxC7Vcg4eS53qEX7h2Nvk7h3x1LqdIfEGDBAzRKm', true), -- mot de passe: admin123 | je sais pas si c'est le bon mot de passe j'ai essayé de mettre un mot de passe hashé mais je pense que ca ne va pas marcher
+('admin', 'system', 'admin@bibliotheque-vintage.dz', '$2a$10$pUWUYeDl0yD.ZAxC7Vcg4eS53qEX7h2Nvk7h3x1LqdIfEGDBAzRKm', true), -- mot de passe: admin123 | je sais pas si c'est le bon mot de passe j'ai essayé de mettre un mot de passe hashé mais je pense que ca ne va pas marcher
 ('dupont', 'prof', 'prof@gmail.com', '$2y$10$KJV7nVKHYKHS20QJA3ASjOWLyuruUzGmjviP4maVYFcmXJu5Eouiq', false); -- mot de passe: user123 | je sais pas si c'est le bon mot de passe j'ai essayé de mettre un mot de passe hashé mais je pense que ca ne va pas marcher
