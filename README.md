@@ -62,7 +62,7 @@ git clone https://github.com/Rahim-444/projectweb
 
 5. **Access the application**
    - Default admin credentials:
-     - Email: admin@bibliotheque-vintage.fr
+     - Email: admin@bibliotheque-vintage.dz
      - Password: admin123 // not sure if it works tho
 
 
