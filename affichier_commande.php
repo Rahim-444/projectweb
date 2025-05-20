@@ -96,7 +96,7 @@ include 'header.php';
             </div>
         </div>
 
-        <?php if ($commande['statut'] === 'en attente'): ?>
+        <?php if ($commande['statut'] === 'En attente'): ?>
             <div class="card">
                 <div class="card-header">
                     <h3>Actions</h3>

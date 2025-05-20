@@ -451,7 +451,7 @@ function changerStatutCommande($id_commande, $nouveau_statut)
     $conn = connectDB();
 
     // Vérifier si le statut est valide
-    $statuts_valides = ['en attente', 'confirmee', 'expediee', 'livree', 'annulee'];
+    $statuts_valides = ['En attente', 'confirmee', 'expediee', 'livree', 'annulee'];
     if (!in_array($nouveau_statut, $statuts_valides)) {
         return false;
     }

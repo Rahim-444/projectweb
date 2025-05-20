@@ -54,7 +54,7 @@ create table commandes (
     id_commande int auto_increment primary key,
     id_utilisateur int,
     date_commande datetime default current_timestamp,
-    statut enum('en attente', 'confirmee', 'expediee', 'livree', 'annulee') default 'en attente',
+    statut enum('En attente', 'confirmee', 'expediee', 'livree', 'annulee') default 'En attente',
     total decimal(10, 2) not null,
     adresse_livraison varchar(255),
     ville_livraison varchar(100),
@@ -162,7 +162,7 @@ create trigger after_commande_confirmed
 after update on commandes
 for each row
 begin
-    if new.statut = 'confirmee' and old.statut = 'en attente' then
+    if new.statut = 'confirmee' and old.statut = 'En attente' then
         update livres l
         join details_commande d on l.id_livre = d.id_livre
         set l.stock = l.stock - d.quantite
