@@ -231,5 +231,5 @@ insert into livres (titre, auteur, id_categorie, description, prix, annee_public
 ('memoires de guerre', 'charles de gaulle', 5, 'temoignage historique de la seconde guerre mondiale', 65.00, 1954, 'plon', 5, 'memoires_guerre.jpg');
 
 insert into utilisateurs (nom, prenom, email, mot_de_passe, est_admin) values
-('admin', 'system', 'admin@bibliotheque-vintage.dz', '$2a$10$pUWUYeDl0yD.ZAxC7Vcg4eS53qEX7h2Nvk7h3x1LqdIfEGDBAzRKm', true), -- mot de passe: admin123 | je sais pas si c'est le bon mot de passe j'ai essayé de mettre un mot de passe hashé mais je pense que ca ne va pas marcher
-('dupont', 'prof', 'prof@gmail.com', '$2y$10$KJV7nVKHYKHS20QJA3ASjOWLyuruUzGmjviP4maVYFcmXJu5Eouiq', false); -- mot de passe: user123 | je sais pas si c'est le bon mot de passe j'ai essayé de mettre un mot de passe hashé mais je pense que ca ne va pas marcher
+('admin', 'system', 'admin@bibliotheque-vintage.dz', '$2a$10$pUWUYeDl0yD.ZAxC7Vcg4eS53qEX7h2Nvk7h3x1LqdIfEGDBAzRKm', true);
+-- mot de passe: admin123
